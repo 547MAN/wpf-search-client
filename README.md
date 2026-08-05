@@ -4,7 +4,9 @@ A small .NET WPF desktop application with one window and a working search bar.
 
 The application searches the SQL database and displays matching records. The project is intentionally simple and focuses only on basic WPF, database access, and search functionality.
 
-Features
+
+
+Features:
 
 One WPF window
 
@@ -22,7 +24,9 @@ Message when no results are found
 
 Basic error handling
 
-Technology
+
+
+Technology:
 
 .NET
 
