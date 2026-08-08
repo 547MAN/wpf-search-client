@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Npgsql;
 
 namespace SearchBar;
 
@@ -16,26 +17,21 @@ namespace SearchBar;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly List<string> _people = new()
-    {
-        "Anders Hansen",
-        "Anna Olsen",
-        "Bjørn Johansen",
-        "Emma Hansen",
-        "David Andersen",
-        "Anders Hansen",
-        "Anna Olsen",
-        "Bjørn Johansen",
-      
-       
-    };
+    private readonly NpgsqlDataSource _dataSource;
+    
     public MainWindow()
     {
         InitializeComponent();
+        var connectionString =
+        Environment.GetEnvironmentVariable("SEARCHBAR_DB_CONNECTION")
+        ?? throw new InvalidOperationException(
+            "Environment variable SEARCHBAR_DB_CONNECTION is not configured.");
+        _dataSource = NpgsqlDataSource.Create(connectionString);
+
 
     }
 
-    private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private async void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
 
 
@@ -46,8 +42,29 @@ public partial class MainWindow : Window
             ResultsListBox.ItemsSource = null;
             return;
         }
-        var results = _people.Where(person => person.Contains(
-            searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        await using var command = _dataSource.CreateCommand(
+            """
+            SELECT name
+            FROM people
+            WHERE name ILIKE $1
+            ORDER BY name;
+            """);
+        command.Parameters.Add(
+            new NpgsqlParameter
+            {
+                Value = $"%{searchText}%"
+            });
+
+        await using var reader = await command.ExecuteReaderAsync();
+
+        var results = new List<string>();
+
+        while (await reader.ReadAsync())
+        {
+            results.Add(reader.GetString(0));
+        }
+        
 
         ResultsListBox.ItemsSource = results;
 
