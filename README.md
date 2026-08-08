@@ -8,21 +8,21 @@ The application searches the SQL database and displays matching records. The pro
 
 Features:
 
-One WPF window
+- [x] One WPF window
 
-Search text box
+- [x] Search text box
 
-Search button
+~~Search button~~
 
-Search by pressing Enter
+~~Search by pressing Enter~~
 
-SQL database search
+- [x] SQL database search
 
-Display matching records
+- [x] Display matching records
 
-Message when no results are found
+~~Message when no results are found~~
 
-Basic error handling
+~~Basic error handling~~
 
 
 
